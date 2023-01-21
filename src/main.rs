@@ -39,15 +39,25 @@ trait Parser<'a, T> {
         }
     }
 
-    fn map<'b, 'c, F, NT>(&'b mut self, f: F) -> LoopParser<'a, 'b, Self, T, F>
+    fn map<'b, 'c, F, NT>(&'b mut self, f: F) -> MapParser<'a, 'b, Self, T, F>
     where
         Self: Sized,
         F: FnMut(&mut StrParser) -> Option<NT>,
     {
-        LoopParser {
+        MapParser {
             phantom: PhantomData,
             parent: self,
             f,
+        }
+    }
+
+    fn many<'b>(&'b mut self) -> ManyParser<'a, 'b, Self, T>
+    where
+        Self: Sized,
+    {
+        ManyParser {
+            phantom: PhantomData,
+            parent: self,
         }
     }
 
@@ -195,7 +205,7 @@ where
     }
 }
 
-struct LoopParser<'a, 'b, P, PT, F>
+struct MapParser<'a, 'b, P, PT, F>
 where
     P: Parser<'a, PT>
 {
@@ -205,24 +215,19 @@ where
 }
 
 impl<'a, 'b, 'c, P, PT, F, T>
-    Parser<'a, Vec<T>>
-    for LoopParser<'a, 'b, P, PT, F>
+    Parser<'a, T>
+    for MapParser<'a, 'b, P, PT, F>
 where
     F: FnMut(&mut StrParser) -> Option<T>,
     P: Parser<'a, PT>,
 {
-    fn get(&mut self) -> Option<Vec<T>> {
+    fn get(&mut self) -> Option<T> {
         self.parent.get()?;
 
         let mut parser = StrParser::new(self.get_str());
-
-        let mut result = vec![];
-
-        while let Some(x) = (self.f)(&mut parser) {
-            result.push(x)
-        }
-
-        Some(result)
+        let result = (self.f)(&mut parser);
+        self.advance((self.parent.get_str().len() - parser.get_str().len()) as i64);
+        result
     }
 
     fn get_str(&self) -> &'a str {
@@ -271,6 +276,38 @@ where
     }
 }
 
+struct ManyParser<'a, 'b, P, PT>
+where
+    P: Parser<'a, PT>
+{
+    phantom: PhantomData<&'a PT>,
+    parent: &'b mut P,
+}
+
+impl<'a, 'b, P, PT> Parser<'a, Vec<PT>> for ManyParser<'a, 'b, P, PT>
+where
+    P: Parser<'a, PT>
+{
+    fn get(&mut self) -> Option<Vec<PT>> {
+        let mut result = vec![];
+
+        while let Some(x) = self.parent.get() {
+            result.push(x)
+        }
+
+        Some(result)
+    }
+
+    fn get_str(&self) -> &'a str {
+        self.parent.get_str()
+    }
+
+    fn advance(&mut self, bytes: i64) {
+        self.parent.advance(bytes)
+    }
+}
+
+
 #[derive(Debug)]
 struct Monkey {
     items: Vec<i64>,
@@ -312,13 +349,15 @@ Monkey 3:
 
     let mut p = StrParser::new(data);
 
-    let monkeys = p.map(|p| Some(Monkey{
-        items: p.find("Starting items").until("\n").map(|p|
-            p.int().get()).get()?,
-        div: p.find("divisible").int().get()?,
-        on_true: p.find("true").int().get()?,
-        on_false: p.find("false").int().get()?,
-    })).get().unwrap();
+    let monkeys = p.map(|p| {
+        p.find("Starting items").get()?;
+        Some(Monkey{
+            items: p.until("\n").int().many().get()?,
+            div: p.find("divisible").int().get()?,
+            on_true: p.find("true").int().get()?,
+            on_false: p.find("false").int().get()?,
+        })
+    }).many().get().unwrap();
 
     println!("{:?}", monkeys);
 }
