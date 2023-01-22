@@ -80,6 +80,13 @@ pub trait Parser<'data, T> {
     {
         ReCap::new(self, re)
     }
+
+    fn re(&mut self, re: &str) -> Re<'data, '_, Self, T>
+    where
+        Self: Sized,
+    {
+        Re::new(self, re)
+    }
 }
 
 pub fn new<'a>(data: &'a str) -> StrParser<'a> {
