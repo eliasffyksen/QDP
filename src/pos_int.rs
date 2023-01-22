@@ -22,12 +22,12 @@ where
     }
 }
 
-impl<'data, 'parent, P, PT> Parser<'data, i64> for PosInt<'data, 'parent, P, PT>
+impl<'data, 'parent, P, PT> Parser<'data, u64> for PosInt<'data, 'parent, P, PT>
 where
     P: Parser<'data, PT>
 {
 
-    fn parse(&mut self, data: &'data str) -> Option<(i64, &'data str)> {
+    fn parse(&mut self, data: &'data str) -> Option<(u64, &'data str)> {
         let (_, data) = self.parent.parse(data)?;
 
         lazy_static! {
@@ -39,7 +39,7 @@ where
         let end = m.end();
 
         let result = &data[start..end];
-        let result = result.parse::<i64>().expect("too large number");
+        let result = result.parse::<u64>().expect("too large number");
 
         Some((result, &data[end..]))
     }
