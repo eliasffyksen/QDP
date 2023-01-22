@@ -131,5 +131,62 @@ p.map(|p| Some(Monkey{
 
 Result `Option<Vec<Monkey>>`:
 ```
-Some([Monkey { items: [79, 98], op: ["*", "19"], on_true: 2, div: 23, on_false: 3 }, Monkey { items: [54, 65, 75, 74], op: ["+", "6"], on_true: 2, div: 19, on_false: 0 }, Monkey { items: [79, 60, 97], op: ["*", "old"], on_true: 1, div: 13, on_false: 3 }, Monkey { items: [74], op: ["+", "3"], on_true: 0, div: 17, on_false: 1 }])
+Some(
+    [
+        Monkey {
+            items: [
+                79,
+                98,
+            ],
+            op: [
+                "*",
+                "19",
+            ],
+            on_true: 2,
+            div: 23,
+            on_false: 3,
+        },
+        Monkey {
+            items: [
+                54,
+                65,
+                75,
+                74,
+            ],
+            op: [
+                "+",
+                "6",
+            ],
+            on_true: 2,
+            div: 19,
+            on_false: 0,
+        },
+        Monkey {
+            items: [
+                79,
+                60,
+                97,
+            ],
+            op: [
+                "*",
+                "old",
+            ],
+            on_true: 1,
+            div: 13,
+            on_false: 3,
+        },
+        Monkey {
+            items: [
+                74,
+            ],
+            op: [
+                "+",
+                "3",
+            ],
+            on_true: 0,
+            div: 17,
+            on_false: 1,
+        },
+    ],
+)
 ```
