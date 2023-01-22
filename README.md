@@ -12,7 +12,7 @@ whole or return `None` without advancing at all. It is all or nothing.
 The parser will skip input indescriminatly if it can parse later input.
 
 The library is heavly based on borrowing so no data is copied or moved during
-the parsing and no heap is used exept for storing the outvalues in `Vector`
+the parsing and no heap is used exept for storing the output values in `Vector`
 and `String` results.
 
 ## Examples
