@@ -7,6 +7,7 @@ mod many;
 mod until;
 mod map;
 mod stay;
+mod re_cap;
 
 use parser::Parser;
 
@@ -46,19 +47,19 @@ Monkey 3:
     #[derive(Debug)]
     struct Monkey {
         items: Vec<i64>,
+        op: Vec<String>,
         on_true: i64,
         div: i64,
         on_false: i64,
     }
 
-    let monkeys = p.map(|p| {
-        Some(Monkey{
-            items: p.find("items").stay().int().many().until("\n").get()?,
-            div: p.find("divisible").int().get()?,
-            on_true: p.find("true").int().get()?,
-            on_false: p.find("false").int().get()?,
-        })
-    }).many().get().unwrap();
+    let monkeys = p.map(|p| Some(Monkey{
+        items: p.find("items").stay().int().many().until("\n").get()?,
+        op: p.re_cap(r"old (.) (\w+)").get()?,
+        div: p.find("divisible").int().get()?,
+        on_true: p.find("true").int().get()?,
+        on_false: p.find("false").int().get()?,
+    })).many().get().unwrap();
 
     println!("{:?}", monkeys);
 }

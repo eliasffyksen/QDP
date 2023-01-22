@@ -1,5 +1,5 @@
 
-use crate::{str_parser::StrParser, find::Find, int::Int, many::Many, until::Until, map::Map, stay::Stay};
+use crate::{str_parser::StrParser, find::Find, int::Int, many::Many, until::Until, map::Map, stay::Stay, re_cap::ReCap};
 
 pub trait Parser<'data, T> {
     fn parse(&mut self, data: &'data str) -> Option<(T, &'data str)>;
@@ -58,6 +58,13 @@ pub trait Parser<'data, T> {
       Self: Sized,
     {
       Stay::new(self)
+    }
+
+    fn re_cap(&mut self, re: &str) -> ReCap<'data, '_, Self, T>
+    where
+        Self: Sized,
+    {
+        ReCap::new(self, re)
     }
 }
 
