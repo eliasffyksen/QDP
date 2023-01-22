@@ -1,5 +1,5 @@
 
-use crate::{str_parser::StrParser, find::Find, int::Int, many::Many, until::Until, map::Map, stay::Stay, re_cap::ReCap, pos_int::PosInt};
+use crate::{str_parser::StrParser, find::Find, int::Int, many::Many, until::Until, map::Map, stay::Stay, re_cap::ReCap, pos_int::PosInt, count::Count, re::Re};
 
 pub trait Parser<'data, T> {
     fn parse(&mut self, data: &'data str) -> Option<(T, &'data str)>;
@@ -22,6 +22,13 @@ pub trait Parser<'data, T> {
         Self: Sized,
     {
       Find::new(self, pat)
+    }
+
+    fn count<'pat>(&mut self, pat: &'pat str) -> Count<'data, '_, 'pat, Self, T>
+    where
+        Self: Sized,
+    {
+      Count::new(self, pat)
     }
 
     fn int<'parent>(&'parent mut self) -> Int<'data, 'parent, Self, T>
